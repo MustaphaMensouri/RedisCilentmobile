@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/connection"
+        android:title="@string/new_connection"
+        android:icon="@drawable/link__1_"
+        app:showAsAction="always"
+        />
+
+    <item
+        android:id="@+id/terminal"
+        android:title="@string/terminal"
+        android:icon="@drawable/terminal2"
+        app:showAsAction="always"/>
+    <item
+        android:id="@+id/log_out"
+        android:title="Log out"
+        app:showAsAction="never"
+        />
+
+    <item
+        android:id="@+id/exit"
+        android:title="@string/exit"
+        app:showAsAction="never"
+        />
+</menu>

@@ -1,0 +1,11 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.Redis_v5" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Customize your light theme here. -->
+        <item name="colorPrimary">@color/color_bar</item>
+        <item name="android:statusBarColor">@color/my_light_primary</item>
+    </style>
+
+    <style name="Theme.Redis_v5" parent="Base.Theme.Redis_v5" />
+
+</resources>

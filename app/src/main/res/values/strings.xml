@@ -1,0 +1,34 @@
+<resources>
+    <string name="app_name">redis_v5</string>
+    <string name="new_keys">New key</string>
+    <string name="flash_db">Flash db</string>
+    <string name="new_connection">New connection</string>
+    <string name="exit">Exit</string>
+    <string name="terminal">Terminal</string>
+    <string name="command">Command</string>
+    <string name="host">host</string>
+    <string name="port">port</string>
+    <string name="username">username</string>
+    <string name="password">password</string>
+
+
+    <string-array name="bd_list">
+        <item>DB0</item>
+        <item>DB1</item>
+        <item>DB2</item>
+        <item>DB3</item>
+        <item>DB4</item>
+        <item>DB5</item>
+        <item>DB6</item>
+        <item>DB7</item>
+        <item>DB8</item>
+        <item>DB9</item>
+        <item>DB10</item>
+        <item>DB11</item>
+        <item>DB12</item>
+        <item>DB13</item>
+        <item>DB14</item>
+        <item>DB15</item>
+        <item>DB16</item>
+    </string-array>
+</resources>

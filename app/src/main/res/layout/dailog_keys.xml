@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:padding="10dp"
+    android:layout_height="match_parent">
+
+    <EditText
+        android:id="@+id/key_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Key name"/>
+    <EditText
+        android:id="@+id/value"
+        android:layout_below="@id/key_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Value"
+        />
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/value_type_list"
+        style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/value"
+        android:hint="value Type">
+
+        <AutoCompleteTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="none"
+            />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <EditText
+        android:id="@+id/ttl"
+        android:layout_below="@id/value_type_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="numberSigned"
+        android:hint="TTL"
+        android:layout_marginTop="5dp"
+        />
+
+</RelativeLayout>
