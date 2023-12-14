@@ -42,12 +42,12 @@ import java.util.Objects;
 import java.util.Set;
 
 public class Home extends AppCompatActivity implements Dailog_keys.DialogListener, Dailog.DialogListener {
-    ArrayList<String> all_keys;
     String host;
     String port;
     String username;
     String password;
     ListView l;
+    Toolbar toolbar;
     RelativeLayout relativeLayout;
 
 
@@ -55,7 +55,7 @@ public class Home extends AppCompatActivity implements Dailog_keys.DialogListene
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
-        Toolbar toolbar = findViewById(R.id.toolbar);
+        toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle(host); // hna fin khas t7t l ip address dyal redis
         setSupportActionBar(toolbar);
 
@@ -107,7 +107,12 @@ public class Home extends AppCompatActivity implements Dailog_keys.DialogListene
     @Override
     public void applyTexts2(String keyname, String value,String valueType, String ttl) {
 //        this is where the query should be created ~~~~~~~~~~~~~~~~~~~~~~~~~################
-        new RedisGetAll(Home.this, l, relativeLayout).execute(host, port, "addKey", keyname, value, ttl);
+        if (ttl.isEmpty()){
+            ttl = "-1";
+        }
+        Toast.makeText(this, keyname+" "+ value + " "+ valueType + " " + ttl, Toast.LENGTH_SHORT).show();
+        new RedisGetAll(Home.this, l, relativeLayout, toolbar).execute(host, port, "addKey", keyname, value, ttl);
+
 
     }
 
@@ -166,7 +171,7 @@ public class Home extends AppCompatActivity implements Dailog_keys.DialogListene
         this.port = port;
         this.username = username;
         this.password = password;
-        new RedisGetAll(Home.this, l, relativeLayout).execute(host, port, "getAllKeys");
+        new RedisGetAll(Home.this, l, relativeLayout, toolbar).execute(host, port, "getAllKeys");
 
 
     }

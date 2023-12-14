@@ -10,6 +10,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.widget.Toolbar;
+
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.exceptions.JedisConnectionException;
 
@@ -19,11 +21,14 @@ import java.util.Set;
 public class RedisGetAll extends AsyncTask<String, Void, ArrayList<String>> {
 
     private ListView listView;
+    private Toolbar toolbar;
     private Context context;
     private RelativeLayout sheet;
-    public RedisGetAll(Context context, ListView listView, RelativeLayout relativeLayout){
+    private String host;
+    public RedisGetAll(Context context, ListView listView, RelativeLayout relativeLayout, Toolbar toolbar){
         this.context = context;
         this.listView = listView;
+        this.toolbar = toolbar;
         this.sheet = relativeLayout;
     }
 
@@ -35,10 +40,12 @@ public class RedisGetAll extends AsyncTask<String, Void, ArrayList<String>> {
         }
 
         String ip = params[0];
+        host = ip;
         int port = Integer.parseInt(params[1]);
         String operation = params[2];
 
         try {
+
             Jedis jedis = new Jedis(ip, port);
 
             // Perform Redis operations based on the requested operation
@@ -53,6 +60,7 @@ public class RedisGetAll extends AsyncTask<String, Void, ArrayList<String>> {
             }
         } catch (JedisConnectionException e) {
             Log.e("RedisConnectionError", "Failed to connect to Redis server", e);
+            Toast.makeText(context, "Failed to connect to Redis server", Toast.LENGTH_SHORT).show();
             return null;
         }
     }
@@ -61,6 +69,7 @@ public class RedisGetAll extends AsyncTask<String, Void, ArrayList<String>> {
     protected void onPostExecute(ArrayList<String> result) {
         if (result != null) {
             ArrayAdapter<String> adapter = new ArrayAdapter<>(context, android.R.layout.simple_list_item_1, result);
+            toolbar.setTitle(host);
             listView.setAdapter(adapter);
             if (sheet != null) {
                 sheet.setVisibility(View.GONE);
@@ -73,10 +82,12 @@ public class RedisGetAll extends AsyncTask<String, Void, ArrayList<String>> {
 
     private ArrayList<String> addKey(Jedis jedis, String key, String value, String ttl) {
         jedis.set(key, value);
-        jedis.expire(key, Long.parseLong(ttl));
-        ArrayList<String > r = new ArrayList<> ();
-        r.add("Key added successfully.");
-        return r;
+        if (!ttl.equals("-1")){
+            jedis.expire(key, Long.parseLong(ttl));
+        }
+
+        Set<String> keys = jedis.keys("*");
+        return new ArrayList<>(keys);
     }
 
     private ArrayList<String> getAllKeys(Jedis jedis) {
