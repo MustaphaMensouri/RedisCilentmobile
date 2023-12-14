@@ -10,6 +10,7 @@
     <string name="port">port</string>
     <string name="username">username</string>
     <string name="password">password</string>
+    <string name="values">values</string>
 
 
     <string-array name="bd_list">

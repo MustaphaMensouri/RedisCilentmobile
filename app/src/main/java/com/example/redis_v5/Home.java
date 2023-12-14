@@ -14,6 +14,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
@@ -83,6 +84,17 @@ public class Home extends AppCompatActivity implements Dailog_keys.DialogListene
         l = findViewById(R.id.list_view);
         relativeLayout = findViewById(R.id.sheet);
 
+        l.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                // Handle item click
+                String selectedItem = (String) parent.getItemAtPosition(position);
+                Toast.makeText(Home.this, "Clicked on: " + selectedItem, Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(Home.this, ShowKey.class);
+                intent.putExtra("key_name", selectedItem);
+                startActivity(intent);
+            }
+        });
 
 
 //        this if we click the new key dialog should pop up
