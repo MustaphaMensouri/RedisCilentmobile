@@ -92,6 +92,8 @@ public class Home extends AppCompatActivity implements Dailog_keys.DialogListene
                 Toast.makeText(Home.this, "Clicked on: " + selectedItem, Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(Home.this, ShowKey.class);
                 intent.putExtra("key_name", selectedItem);
+                intent.putExtra("ip", host);
+                intent.putExtra("port", port);
                 startActivity(intent);
             }
         });
