@@ -50,7 +50,7 @@ public class Dailog_keys extends AppCompatDialogFragment {
                     }
                 });
 
-        String[] items = {"string", "list", "hash map"};
+        String[] items = {"String", "List", "Hash map"};
         ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), R.layout.drop_menu_item, items);
 
         TextInputLayout textInputLayout = (TextInputLayout) view.findViewById(R.id.value_type_list); // Replace with your actual ID

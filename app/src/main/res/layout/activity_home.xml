@@ -26,6 +26,7 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="20dp"
         android:layout_marginTop="15dp"
+
         android:hint="db">
 
         <AutoCompleteTextView
@@ -33,6 +34,7 @@
             android:layout_height="wrap_content"
             android:textSize="12sp"
             android:inputType="none"
+            android:dropDownHeight="200dp"
             />
 
     </com.google.android.material.textfield.TextInputLayout>
@@ -47,6 +49,16 @@
         android:src="@drawable/add"
         android:contentDescription="@string/new_keys"
         android:backgroundTint="@color/color_bar"
+        android:layout_margin="16dp" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/refresh"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:src="@drawable/refresh"
+        android:contentDescription="@string/new_keys"
+        android:backgroundTint="@color/ref"
         android:layout_margin="16dp" />
 
     <Button

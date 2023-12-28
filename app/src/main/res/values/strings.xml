@@ -11,6 +11,9 @@
     <string name="username">username</string>
     <string name="password">password</string>
     <string name="values">values</string>
+    <string name="Terminallogo">
+            hello
+    </string>
 
 
     <string-array name="bd_list">

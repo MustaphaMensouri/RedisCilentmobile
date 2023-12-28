@@ -2,11 +2,12 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="hint_white">#DADADA</color>
+    <color name="hint_white">#BCBCBC</color>
     <color name="color_bar">#F4766D</color>
     <color name="my_light_primary">#EFD5D5</color>
     <color name="color_icon">#F9A825</color>
     <color name="color_button_text">#352203</color>
     <color name="background_app">#FDF1F1</color>
+    <color name="ref">#0D8AEC</color>
 
 </resources>

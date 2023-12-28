@@ -18,19 +18,18 @@ import redis.clients.jedis.exceptions.JedisConnectionException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class RedisSowkey extends AsyncTask<String, Void, String> {
     private Context context;
     private AutoCompleteTextView type;
-    private TextInputEditText name;
     private TextInputEditText ttl;
 
     private TextInputEditText value;
 
-    public RedisSowkey(Context context, AutoCompleteTextView type, TextInputEditText name, TextInputEditText ttl, TextInputEditText value){
+    public RedisSowkey(Context context, AutoCompleteTextView type, TextInputEditText ttl, TextInputEditText value){
         this.context = context;
         this.type = type;
-        this.name = name;
         this.ttl = ttl;
         this.value = value;
     }
@@ -55,7 +54,7 @@ public class RedisSowkey extends AsyncTask<String, Void, String> {
                 case "getKey":
                     return getKey(jedis, params[3]);
                 case "updateKey":
-                    return updateKey(jedis, params[3], params[4], params[5]);
+                    return updateKey(jedis, params[3], params[4], params[5], params[6]);
 // Add more cases for other operations as needed
                 default:
                     return null;
@@ -70,9 +69,16 @@ public class RedisSowkey extends AsyncTask<String, Void, String> {
     protected void onPostExecute(String result) {
         if (result != null) {
             String[] splitArray = result.split(":");
-            name.setText(splitArray[2]);
             value.setText(splitArray[0]);
             ttl.setText(splitArray[1]);
+            Toast.makeText(context, splitArray[3], Toast.LENGTH_SHORT).show();
+            String[] items = {"string", "list", "hash map"};
+
+            if (splitArray[3].equals("string")){
+                type.setText(items[0], false);
+            } else if (splitArray[3].equals("list")) {
+                type.setText(items[1], false);
+            }
 
 
         } else {
@@ -82,20 +88,46 @@ public class RedisSowkey extends AsyncTask<String, Void, String> {
     }
 
     private String getKey(Jedis jedis, String key) {
-        String val = jedis.get(key);
-        String t = String.valueOf(jedis.ttl(key));
-        return val+":"+t+":"+key;
-    }
-    private String updateKey(Jedis jedis, String key, String value, String ttl) {
-        jedis.set(key, value);
-
-        if (!ttl.equals("-1")){
-            jedis.expire(key, Long.parseLong(ttl));
+        if (jedis.type(key).equals("string")){
+            String val = jedis.get(key);
+            String t = String.valueOf(jedis.ttl(key));
+            return val + ":" + t + ":" + key+ ":string";
+        }else if (jedis.type(key).equals("list")){
+            List<String> val = jedis.lrange(key, 0, -1);
+            String t = String.valueOf(jedis.ttl(key));
+            return val.toString() + ":" + t + ":" + key+ ":list";
         }
+        return "";
+    }
+    private String updateKey(Jedis jedis, String key, String value, String ttl, String type) {
+        if (type.equals("string")){
+            jedis.set(key, value);
 
-        String val = jedis.get(key);
-        String t = String.valueOf(jedis.ttl(key));
-        return val+":"+t+":"+key;
+            if (!ttl.equals("-1")) {
+                jedis.expire(key, Long.parseLong(ttl));
+            }
+
+            String val = jedis.get(key);
+            String t = String.valueOf(jedis.ttl(key));
+            return val + ":" + t + ":" + key+":string";
+        } else if (type.equals("list")) {
+            jedis.del(key);
+            String result=value.replaceAll("\\s*,\\s*", ",");
+            String[] elements = result.replaceAll("\\[|\\]", "").split(",");
+
+            // Convert the array to an ArrayList
+            List<String> arrayList = new ArrayList<>(Arrays.asList(elements));
+
+            // Print the ArrayList
+            for (int i =0; i<arrayList.size(); i++) {
+                jedis.rpush(key, arrayList.get(i));
+            }
+            List<String> val = jedis.lrange(key, 0, -1);
+            String t = String.valueOf(jedis.ttl(key));
+            return val.toString() + ":" + t + ":" + key + ":list";
+
+        }
+        return "none:-1:none:none";
     }
 
     // Add more methods for additional Redis operations as needed

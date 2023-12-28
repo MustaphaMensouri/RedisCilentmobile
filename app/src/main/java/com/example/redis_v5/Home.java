@@ -28,6 +28,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.redis_v5.redis.RedisDelete;
 import com.example.redis_v5.redis.RedisGetAll;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
@@ -43,10 +44,10 @@ import java.util.Objects;
 import java.util.Set;
 
 public class Home extends AppCompatActivity implements Dailog_keys.DialogListener, Dailog.DialogListener {
-    String host;
-    String port;
-    String username;
-    String password;
+    String host = "";
+    String port = "";
+    String username = "";
+    String password = "";
     ListView l;
     Toolbar toolbar;
     RelativeLayout relativeLayout;
@@ -89,7 +90,6 @@ public class Home extends AppCompatActivity implements Dailog_keys.DialogListene
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 // Handle item click
                 String selectedItem = (String) parent.getItemAtPosition(position);
-                Toast.makeText(Home.this, "Clicked on: " + selectedItem, Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(Home.this, ShowKey.class);
                 intent.putExtra("key_name", selectedItem);
                 intent.putExtra("ip", host);
@@ -108,6 +108,18 @@ public class Home extends AppCompatActivity implements Dailog_keys.DialogListene
             }
         });
 
+        FloatingActionButton refresh = findViewById(R.id.refresh);
+        refresh.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Boolean is = !host.isEmpty() && !port.isEmpty();
+                if(!host.isEmpty() && !port.isEmpty()){
+                new RedisGetAll(Home.this, l, relativeLayout, toolbar).execute(host, port, "getAllKeys");
+            }else Toast.makeText(Home.this, "no connection", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+
 
 
     }
@@ -124,10 +136,9 @@ public class Home extends AppCompatActivity implements Dailog_keys.DialogListene
         if (ttl.isEmpty()){
             ttl = "-1";
         }
-        Toast.makeText(this, keyname+" "+ value + " "+ valueType + " " + ttl, Toast.LENGTH_SHORT).show();
-        new RedisGetAll(Home.this, l, relativeLayout, toolbar).execute(host, port, "addKey", keyname, value, ttl);
-
-
+        if(!host.isEmpty() && !port.isEmpty())
+        new RedisGetAll(Home.this, l, relativeLayout, toolbar).execute(host, port, "addKey", keyname, value, ttl, valueType);
+        else Toast.makeText(Home.this, "no connection", Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -144,8 +155,17 @@ public class Home extends AppCompatActivity implements Dailog_keys.DialogListene
             openDialog();
             return true;
         } else if (item.getItemId() == R.id.terminal) {
-            startActivity(new Intent(Home.this, Terminal.class));
-            return true;
+
+            if(!host.isEmpty() && !port.isEmpty()) {
+                Intent intent = new Intent(Home.this, Terminal.class);
+
+                intent.putExtra("ip", host);
+                intent.putExtra("port", port);
+                startActivity(intent);
+                return true;
+            }else {
+                return false;
+            }
         } else if (item.getItemId() == R.id.log_out) {
             Toast.makeText(this, "log out", Toast.LENGTH_SHORT).show();
             return true;
@@ -167,11 +187,13 @@ public class Home extends AppCompatActivity implements Dailog_keys.DialogListene
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 Toast.makeText(Home.this, "ok your database is flashed", Toast.LENGTH_SHORT).show();
+                if(!host.isEmpty() && !port.isEmpty())
+                new RedisDelete(Home.this).execute(host, port, "flush");
+                else Toast.makeText(Home.this, "no connection", Toast.LENGTH_SHORT).show();
             }
         }).setNegativeButton("no", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                Toast.makeText(Home.this, "you canceled the flash of you database", Toast.LENGTH_SHORT).show();
 
             }
         });

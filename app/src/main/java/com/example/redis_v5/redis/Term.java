@@ -3,32 +3,38 @@ package com.example.redis_v5.redis;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.textfield.TextInputEditText;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.exceptions.JedisConnectionException;
 
-public class RedisUpdate extends AsyncTask<String, Void, String> {
+public class Term extends AsyncTask<String, Void, String> {
     private Context context;
-    private AutoCompleteTextView type;
-    private TextInputEditText name;
-    private TextInputEditText ttl;
+//    private ListView terminal;
+//    private ArrayAdapter<String> adapter;
+//    private String command;
+//    private ArrayList<String> cmd;
 
-    private TextInputEditText value;
-
-    public RedisUpdate(Context context, AutoCompleteTextView type, TextInputEditText name, TextInputEditText ttl, TextInputEditText value){
+    public Term(Context context){//, ListView terminal, String command, ArrayAdapter<String> adapter){
         this.context = context;
-        this.type = type;
-        this.name = name;
-        this.ttl = ttl;
-        this.value = value;
+//        this.terminal = terminal;
+//        this.command = command;
+//        this.adapter = adapter;
     }
 
     @Override
     protected String doInBackground(String... params) {
+
         if (params.length < 3) {
             Log.e("RedisTask", "Insufficient parameters. Expected IP, port, and operation.");
             Toast.makeText(context, "Insufficient parameters. Expected IP, port, and operation.", Toast.LENGTH_SHORT).show();
@@ -44,8 +50,8 @@ public class RedisUpdate extends AsyncTask<String, Void, String> {
 
             // Perform Redis operations based on the requested operation
             switch (operation) {
-                case "getKey":
-                    return getKey(jedis, params[3]);
+                case "runCommand":
+                    return runCommand(jedis, params[3]);
 // Add more cases for other operations as needed
                 default:
                     return null;
@@ -56,25 +62,23 @@ public class RedisUpdate extends AsyncTask<String, Void, String> {
         }
     }
 
-    @Override
-    protected void onPostExecute(String result) {
-        if (result != null) {
-            String[] splitArray = result.split(":");
-            name.setText(splitArray[2]);
-            value.setText(splitArray[0]);
-            ttl.setText(splitArray[1]);
+//    @Override
+//    protected void onPostExecute(String result) {
+//        if (result != null) {
+//
+//        } else {
+//            // Handle connection error
+//            Toast.makeText(context, "error of connection", Toast.LENGTH_SHORT).show();
+//        }
+//    }
 
-
-        } else {
-            // Handle connection error
-            Toast.makeText(context, "error of connection", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    private String getKey(Jedis jedis, String key) {
-        String val = jedis.get(key);
-        String t = String.valueOf(jedis.ttl(key));
-        return val+":"+t+":"+key;
+    private String runCommand(Jedis jedis, String query) {
+        String[] q=query.split("\\s+");
+        String cmd='\''+q[0]+'\'';
+        for(int i=1;i<q.length;i++)
+            cmd+=",\'"+q[i]+'\'';
+        String result = jedis.eval("return redis.call("+cmd+")").toString();
+        return result;
     }
 
     // Add more methods for additional Redis operations as needed

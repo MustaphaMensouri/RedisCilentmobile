@@ -12,10 +12,15 @@ import android.widget.Toast;
 
 import androidx.appcompat.widget.Toolbar;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.exceptions.JedisConnectionException;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 
 public class RedisGetAll extends AsyncTask<String, Void, ArrayList<String>> {
@@ -41,6 +46,7 @@ public class RedisGetAll extends AsyncTask<String, Void, ArrayList<String>> {
 
         String ip = params[0];
         host = ip;
+
         int port = Integer.parseInt(params[1]);
         String operation = params[2];
 
@@ -53,7 +59,7 @@ public class RedisGetAll extends AsyncTask<String, Void, ArrayList<String>> {
                 case "getAllKeys":
                     return getAllKeys(jedis);
                 case "addKey":
-                    return addKey(jedis, params[3], params[4], params[5]);
+                    return addKey(jedis, params[3], params[4], params[5], params[6]);
                 // Add more cases for other operations as needed
                 default:
                     return null;
@@ -80,10 +86,22 @@ public class RedisGetAll extends AsyncTask<String, Void, ArrayList<String>> {
         }
     }
 
-    private ArrayList<String> addKey(Jedis jedis, String key, String value, String ttl) {
+    private ArrayList<String> addKey(Jedis jedis, String key, String value, String ttl, String type) {
+        if (type.equals("String")){
         jedis.set(key, value);
         if (!ttl.equals("-1")){
             jedis.expire(key, Long.parseLong(ttl));
+        }}else if (type.equals("List")){
+            String result=value.replaceAll("\\s*,\\s*", ",");
+            String[] elements = result.replaceAll("\\[|\\]", "").split(",");
+
+            // Convert the array to an ArrayList
+            List<String> arrayList = new ArrayList<>(Arrays.asList(elements));
+
+            // Print the ArrayList
+            for (int i =0; i<arrayList.size(); i++) {
+                jedis.rpush(key, arrayList.get(i));
+            }
         }
 
         Set<String> keys = jedis.keys("*");
