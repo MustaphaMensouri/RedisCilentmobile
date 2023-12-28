@@ -49,8 +49,10 @@ public class Home extends AppCompatActivity implements Dailog_keys.DialogListene
     String username = "";
     String password = "";
     ListView l;
+    String index="0";
     Toolbar toolbar;
     RelativeLayout relativeLayout;
+    RelativeLayout layout;
 
 
     @Override
@@ -69,6 +71,18 @@ public class Home extends AppCompatActivity implements Dailog_keys.DialogListene
         AutoCompleteTextView autoCompleteTextView = (AutoCompleteTextView) textInputLayout.getEditText();
         autoCompleteTextView.setText(items[0], false);
         autoCompleteTextView.setAdapter(adapter);
+
+        autoCompleteTextView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                // This method will be invoked when an item in the AutoCompleteTextView is selected
+                index = String.valueOf(position);
+                if(!host.isEmpty() && !port.isEmpty()){
+                    new RedisGetAll(Home.this, l, relativeLayout, toolbar).execute(host, port, "getAllKeys", index);
+                }
+            }
+        });
+
 //        this is the end of the code.
 // flash the database
         Button flash = findViewById(R.id.flash_db);
@@ -84,6 +98,7 @@ public class Home extends AppCompatActivity implements Dailog_keys.DialogListene
         // Adding elements to the ArrayList
         l = findViewById(R.id.list_view);
         relativeLayout = findViewById(R.id.sheet);
+        layout = findViewById(R.id.layout);
 
         l.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -94,6 +109,7 @@ public class Home extends AppCompatActivity implements Dailog_keys.DialogListene
                 intent.putExtra("key_name", selectedItem);
                 intent.putExtra("ip", host);
                 intent.putExtra("port", port);
+                intent.putExtra("index", index);
                 startActivity(intent);
             }
         });
@@ -112,9 +128,8 @@ public class Home extends AppCompatActivity implements Dailog_keys.DialogListene
         refresh.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Boolean is = !host.isEmpty() && !port.isEmpty();
                 if(!host.isEmpty() && !port.isEmpty()){
-                new RedisGetAll(Home.this, l, relativeLayout, toolbar).execute(host, port, "getAllKeys");
+                new RedisGetAll(Home.this, l, relativeLayout, toolbar).execute(host, port, "getAllKeys", index);
             }else Toast.makeText(Home.this, "no connection", Toast.LENGTH_SHORT).show();
             }
         });
@@ -137,7 +152,7 @@ public class Home extends AppCompatActivity implements Dailog_keys.DialogListene
             ttl = "-1";
         }
         if(!host.isEmpty() && !port.isEmpty())
-        new RedisGetAll(Home.this, l, relativeLayout, toolbar).execute(host, port, "addKey", keyname, value, ttl, valueType);
+        new RedisGetAll(Home.this, l, relativeLayout, toolbar).execute(host, port, "addKey", keyname, value, ttl, valueType, index);
         else Toast.makeText(Home.this, "no connection", Toast.LENGTH_SHORT).show();
     }
 
@@ -204,10 +219,12 @@ public class Home extends AppCompatActivity implements Dailog_keys.DialogListene
 //        this is where the query should be created ~~~~~~~~~~~~~~~~~~~~~~~~~################
 
         this.host = host;
-        this.port = port;
+        this.port = "6379";
+        if (!port.isEmpty()){
+        this.port = port;}
         this.username = username;
         this.password = password;
-        new RedisGetAll(Home.this, l, relativeLayout, toolbar).execute(host, port, "getAllKeys");
+        new RedisGetAll(Home.this, l, relativeLayout, toolbar).execute(host, port, "getAllKeys", index);
 
 
     }

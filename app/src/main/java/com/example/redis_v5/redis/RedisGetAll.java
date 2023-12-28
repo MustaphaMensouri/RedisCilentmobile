@@ -46,8 +46,10 @@ public class RedisGetAll extends AsyncTask<String, Void, ArrayList<String>> {
 
         String ip = params[0];
         host = ip;
-
-        int port = Integer.parseInt(params[1]);
+        int port = 6379;
+        if(!params[1].isEmpty()){
+        port = Integer.parseInt(params[1]);
+        }
         String operation = params[2];
 
         try {
@@ -57,16 +59,15 @@ public class RedisGetAll extends AsyncTask<String, Void, ArrayList<String>> {
             // Perform Redis operations based on the requested operation
             switch (operation) {
                 case "getAllKeys":
-                    return getAllKeys(jedis);
+                    return getAllKeys(jedis, params[3]);
                 case "addKey":
-                    return addKey(jedis, params[3], params[4], params[5], params[6]);
+                    return addKey(jedis, params[3], params[4], params[5], params[6], params[7]);
                 // Add more cases for other operations as needed
                 default:
                     return null;
             }
-        } catch (JedisConnectionException e) {
+        } catch (Exception e) {
             Log.e("RedisConnectionError", "Failed to connect to Redis server", e);
-            Toast.makeText(context, "Failed to connect to Redis server", Toast.LENGTH_SHORT).show();
             return null;
         }
     }
@@ -82,11 +83,12 @@ public class RedisGetAll extends AsyncTask<String, Void, ArrayList<String>> {
             }
         } else {
             // Handle connection error
-            Toast.makeText(context, result.toString(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "Failed to connect to Redis server", Toast.LENGTH_SHORT).show();
         }
     }
 
-    private ArrayList<String> addKey(Jedis jedis, String key, String value, String ttl, String type) {
+    private ArrayList<String> addKey(Jedis jedis, String key, String value, String ttl, String type, String index) {
+        jedis.select(Integer.parseInt(index));
         if (type.equals("String")){
         jedis.set(key, value);
         if (!ttl.equals("-1")){
@@ -108,16 +110,10 @@ public class RedisGetAll extends AsyncTask<String, Void, ArrayList<String>> {
         return new ArrayList<>(keys);
     }
 
-    private ArrayList<String> getAllKeys(Jedis jedis) {
+    private ArrayList<String> getAllKeys(Jedis jedis, String index) {
+        jedis.select(Integer.parseInt(index));
         Set<String> keys = jedis.keys("*");
         return new ArrayList<>(keys);
-    }
-
-    private ArrayList<String> getKey(Jedis jedis, String key) {
-        String value = jedis.get(key);
-        ArrayList<String > rp = new ArrayList<> ();
-        rp.add(key + ":" + value);
-        return rp;
     }
 
     // Add more methods for additional Redis operations as needed

@@ -15,7 +15,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="127.0.0.1:6379>"
-                android:textColor="#49EC26"
+                android:textColor="#09AE09"
                 />
             <TextView
                 android:id="@+id/command_to_run"

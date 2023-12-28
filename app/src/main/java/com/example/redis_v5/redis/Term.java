@@ -14,6 +14,8 @@ import com.google.android.material.textfield.TextInputEditText;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.exceptions.JedisConnectionException;
@@ -42,7 +44,9 @@ public class Term extends AsyncTask<String, Void, String> {
         }
 
         String ip = params[0];
-        int port = Integer.parseInt(params[1]);
+        int port = 6379;
+        if(!params[1].isEmpty())
+            port = Integer.parseInt(params[1]);
         String operation = params[2];
 
         try {
@@ -56,7 +60,7 @@ public class Term extends AsyncTask<String, Void, String> {
                 default:
                     return null;
             }
-        } catch (JedisConnectionException e) {
+        } catch (Exception e) {
             Log.e("RedisConnectionError", "Failed to connect to Redis server", e);
             return null;
         }
@@ -73,11 +77,41 @@ public class Term extends AsyncTask<String, Void, String> {
 //    }
 
     private String runCommand(Jedis jedis, String query) {
-        String[] q=query.split("\\s+");
-        String cmd='\''+q[0]+'\'';
-        for(int i=1;i<q.length;i++)
-            cmd+=",\'"+q[i]+'\'';
-        String result = jedis.eval("return redis.call("+cmd+")").toString();
+        String cmd;
+
+        String pattern = "\"([^\"]*)\"";
+        Pattern r = Pattern.compile(pattern);
+
+        // Create a matcher with the input query
+        Matcher m = r.matcher(query);
+
+        // Find the first occurrence of the pattern
+        if (m.find()) {
+            // Extract the matched value (group 1)
+            String extractedValue = m.group(1);
+
+            String modifiedQuery = query.replace("\"" + extractedValue + "\"", "");
+            String[] q=modifiedQuery.split("\\s+");
+
+            cmd='\''+q[0]+'\'';
+            for(int i=1;i<q.length;i++)
+                cmd+=",\'"+q[i]+'\'';
+            cmd += ",\'"+extractedValue+'\'';
+        }else {
+            String[] q=query.split("\\s+");
+
+            cmd='\''+q[0]+'\'';
+            for(int i=1;i<q.length;i++)
+                cmd+=",\'"+q[i]+'\'';
+
+        }
+        String result;
+        try {
+            result = jedis.eval("return redis.call("+cmd+")").toString();
+        }catch (Exception e){
+            result = "(error) ERR unknown command";
+        }
+
         return result;
     }
 

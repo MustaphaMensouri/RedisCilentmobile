@@ -4,8 +4,10 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.AutoCompleteTextView;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
 
 import redis.clients.jedis.Jedis;
@@ -27,7 +29,9 @@ public class RedisDelete extends AsyncTask<String, Void, String> {
         }
 
         String ip = params[0];
-        int port = Integer.parseInt(params[1]);
+        int port = 6379;
+        if(!params[1].isEmpty())
+            port = Integer.parseInt(params[1]);
         String operation = params[2];
 
         try {
@@ -36,7 +40,7 @@ public class RedisDelete extends AsyncTask<String, Void, String> {
             // Perform Redis operations based on the requested operation
             switch (operation) {
                 case "DeleteKey":
-                    return deleteKey(jedis, params[3]);
+                    return deleteKey(jedis, params[3], params[4]);
                 case "flush":
                     return flash(jedis);
 // Add more cases for other operations as needed
@@ -51,27 +55,19 @@ public class RedisDelete extends AsyncTask<String, Void, String> {
 
     private String flash(Jedis jedis) {
         jedis.flushAll();
-        return "true";
+        return "flush";
     }
 
-    @Override
-    protected void onPostExecute(String result) {
-        if (result != null) {
+//    @Override
+//    protected void onPostExecute(String result) {
+//
+//    }
 
-            Toast.makeText(context, "the key deleted successfully.", Toast.LENGTH_SHORT).show();
-
-        } else {
-            // Handle connection error
-            Toast.makeText(context, "error of connection", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    private String deleteKey(Jedis jedis, String key) {
+    private String deleteKey(Jedis jedis, String key, String index) {
+        jedis.select(Integer.parseInt(index));
         if (jedis.exists(key)){
             jedis.del(key);
         }
-        return "true";
+        return "delete";
     }
-
-    // Add more methods for additional Redis operations as needed
 }

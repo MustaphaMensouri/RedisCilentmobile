@@ -25,7 +25,9 @@ protected String doInBackground(String... params) {
         }
 
         String ip = params[0];
-        int port = Integer.parseInt(params[1]);
+        int port = 6379;
+        if(!params[1].isEmpty())
+                port = Integer.parseInt(params[1]);
         String operation = params[2];
 
         try {
